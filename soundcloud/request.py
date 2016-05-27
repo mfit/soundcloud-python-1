@@ -141,9 +141,15 @@ def make_request(method, url, params):
         result = request_func(url, **kwargs)
 
     # if redirects are disabled, don't raise for 301 / 302
+    # Temporary HACK for this Soundcloud Issue:
+    # https://github.com/soundcloud/soundcloud-python/issues/68#issuecomment-222064102
     if result.status_code in (301, 302):
         if allow_redirects:
             result.raise_for_status()
+    elif result.status_code in (401, ):
+        if result.headers['Status'] == "201 Created":
+            result = requests.get("{}?oauth_token={}".format(
+                                  result.headers['Location'], data['oauth_token']))
     else:
         result.raise_for_status()
     return result
