@@ -118,6 +118,11 @@ def make_request(method, url, params):
     if 'allow_redirects' in params:
         del params['allow_redirects']
 
+    # headers, not params
+    if 'oauth_token' in params:
+        kwargs['headers']['Authorization'] = 'OAuth %s' % params['oauth_token']
+        del params['oauth_token']
+
     params = hashconversions.to_params(params)
     files = namespaced_query_string(extract_files_from_dict(params))
     data = namespaced_query_string(remove_files_from_dict(params))
