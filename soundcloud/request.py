@@ -146,10 +146,10 @@ def make_request(method, url, params):
     if result.status_code in (301, 302):
         if allow_redirects:
             result.raise_for_status()
-    elif result.status_code in (401, ):
-        if result.headers['Status'] == "201 Created":
-            result = requests.get("{}?oauth_token={}".format(
-                                  result.headers['Location'], data['oauth_token']))
+    # elif result.status_code in (401, ):
+    #     if result.headers['Status'] == "201 Created":
+    #         result = requests.get("{}?oauth_token={}".format(
+    #                               result.headers['Location'], data['oauth_token']))
     else:
         result.raise_for_status()
     return result
