@@ -118,6 +118,11 @@ def make_request(method, url, params):
     if 'allow_redirects' in params:
         del params['allow_redirects']
 
+    # headers, not params
+    if 'oauth_token' in params:
+        kwargs['headers']['Authorization'] = 'OAuth %s' % params['oauth_token']
+        del params['oauth_token']
+
     params = hashconversions.to_params(params)
     files = namespaced_query_string(extract_files_from_dict(params))
     data = namespaced_query_string(remove_files_from_dict(params))
@@ -146,10 +151,10 @@ def make_request(method, url, params):
     if result.status_code in (301, 302):
         if allow_redirects:
             result.raise_for_status()
-    elif result.status_code in (401, ):
-        if result.headers['Status'] == "201 Created":
-            result = requests.get("{}?oauth_token={}".format(
-                                  result.headers['Location'], data['oauth_token']))
+    # elif result.status_code in (401, ):
+    #     if result.headers['Status'] == "201 Created":
+    #         result = requests.get("{}?oauth_token={}".format(
+    #                               result.headers['Location'], data['oauth_token']))
     else:
         result.raise_for_status()
     return result
